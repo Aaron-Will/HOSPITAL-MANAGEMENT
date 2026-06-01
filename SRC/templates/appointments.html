@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-calendar-check"></i> Appointment Management</h2>
+                <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                    <i class="fas fa-plus"></i> Schedule Appointment
+                </button>
+            </div>
+            
+            <!-- Date Selector -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('appointments') }}" class="row g-3">
+                        <div class="col-auto">
+                            <label class="form-label">Select Date:</label>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" name="date" class="form-control" value="{{ selected_date if selected_date else '' }}">
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary">View</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Appointments Table -->
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Symptoms</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if appointments %}
+                            {% for apt in appointments %}
+                            <tr>
+                                <td>{{ apt.appointment_id }}</td>
+                                <td>{{ apt.patient_fname }} {{ apt.patient_lname }}</td>
+                                <td>Dr. {{ apt.doctor_fname }} {{ apt.doctor_lname }}</td>
+                                <td>{{ apt.appointment_date }}</td>
+                                <td>{{ apt.appointment_time }}</td>
+                                <td>{{ apt.status }}</td>
+                                <td>{{ apt.symptoms }}</td>
+                                <td>
+                                    <a href="/update_appointment/{{ apt.appointment_id }}" class="btn btn-sm btn-warning">
+                                        Update Status
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center">No appointments found for this date</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule Appointment Modal -->
+<div class="modal fade" id="scheduleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Schedule Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('schedule_appointment') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Patient ID:</label>
+                        <input type="number" name="patient_id" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Doctor ID:</label>
+                        <input type="number" name="doctor_id" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Date:</label>
+                        <input type="date" name="appointment_date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Time:</label>
+                        <input type="time" name="appointment_time" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Symptoms:</label>
+                        <textarea name="symptoms" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Rooms{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="h2 mb-0">Room Management</h1>
+            <p class="mb-0 mt-2">Manage hospital rooms and patient admissions</p>
+        </div>
+        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#admitModal">
+            <i class="fas fa-hospital-user"></i> Admit Patient
+        </button>
+    </div>
+</div>
+
+<!-- Available Rooms -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4>Available Rooms</h4>
+    </div>
+    {% for room in rooms %}
+    <div class="col-md-3 mb-3">
+        <div class="card {% if room.status == 'Available' %}border-success{% else %}border-warning{% endif %}">
+            <div class="card-body">
+                <h5 class="card-title">Room {{ room.room_number }}</h5>
+                <p class="card-text">
+                    <strong>Type:</strong> {{ room.room_type }}<br>
+                    <strong>Price:</strong> ${{ room.price_per_day }}/day<br>
+                    <strong>Status:</strong> 
+                    <span class="badge {% if room.status == 'Available' %}bg-success{% else %}bg-warning{% endif %}">
+                        {{ room.status }}
+                    </span>
+                </p>
+                {% if room.status == 'Available' %}
+                <button class="btn btn-sm btn-success" onclick="admitToRoom('{{ room.room_id }}', '{{ room.room_number }}')">
+                    <i class="fas fa-check"></i> Admit Patient
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Admit Patient Modal -->
+<div class="modal fade" id="admitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Admit Patient</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('admit_patient') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Patient ID *</label>
+                        <input type="number" class="form-control" name="patient_id" id="admitPatientId" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Room ID *</label>
+                        <input type="number" class="form-control" name="room_id" id="admitRoomId" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Diagnosis</label>
+                        <textarea class="form-control" name="diagnosis" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Admit Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function admitToRoom(roomId, roomNumber) {
+        $('#admitRoomId').val(roomId);
+        $('#admitModal').modal('show');
+        $('#admitModal .modal-title').text('Admit Patient to Room ' + roomNumber);
+    }
+</script>
+{% endblock %}
